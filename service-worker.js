@@ -1,14 +1,7 @@
-var shellCacheName = 'food-shell-v1';
-
-// caching.js
-self.addEventListener("install", event => {
-  event.waitUntil(
-    // Open a cache of resources.
-    caches.open(shellCacheName).then(cache => {
-      // Begins the process of fetching them.
-      // The coast is only clear when all the resources are ready.
-      return cache.addAll([
-        '/',
+// Start
+var CACHE_NAME = 'food-shell-v1';
+var urlsToCache = [
+  '/',
         './index.html',
         './restaurant.html',
         './css/styles.css',
@@ -27,15 +20,29 @@ self.addEventListener("install", event => {
         './img/8.jpg',
         './img/9.jpg',
         './img/10.jpg'
-      ]);
-    })
+];
+
+self.addEventListener('install', function(event) {
+  // Perform install steps
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(function(cache) {
+        console.log('Opened cache');
+        return cache.addAll(urlsToCache);
+      })
   );
 });
 
-self.addEventListener("fetch", event => {
+self.addEventListener('fetch', function(event) {
   event.respondWith(
-    caches.match(e.request).then(response => {
-      return response || fetch(e.request);
-    })
+    caches.match(event.request)
+      .then(function(response) {
+        // Cache hit - return response
+        if (response) {
+          return response;
+        }
+        return fetch(event.request);
+      }
+    )
   );
 });
